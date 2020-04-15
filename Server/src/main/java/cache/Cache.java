@@ -8,4 +8,6 @@ public interface Cache {
   CacheEntry get(@Nonnull final String key);
 
   boolean set(@Nonnull final CacheEntry entry);
+
+  boolean add(@Nonnull final CacheEntry entry);
 }

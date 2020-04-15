@@ -13,16 +13,16 @@ public class SetCommand extends Command {
   private int expTime;
 
   public SetCommand(@Nonnull final Cache cache) {
-    super("set", cache);
+    super(cache);
   }
 
   @Override
   public CommandResult execute() throws MemCacheException {
-    final CacheEntry entry = new CacheEntry(getKey(), getData(), flags, expTime);
+    final CacheEntry entry = new CacheEntry(getKey(), getData(), getFlags(), getExpTime());
     final boolean setResult = getCache().set(entry);
     final String strResult = setResult ? "STORED\r\n" : "SERVER_ERROR\r\n";
 
-    return new CommandResult(CommandType.SET, strResult.getBytes());
+    return new CommandResult(getType(), strResult.getBytes());
   }
 
   /**
@@ -41,14 +41,14 @@ public class SetCommand extends Command {
     // Flags
     length = in.bytesBefore(DELIMITER_SPACE);
     setFlags(Integer.parseInt(read(in, length)));
-    
+
     // Skipping 'space'
     in.skipBytes(1);
 
     // expTime
     length = in.bytesBefore(DELIMITER_SPACE);
     setExpTime(Integer.parseInt(read(in, length)));
-    
+
     // Skipping 'space'
     in.skipBytes(1);
 
@@ -72,6 +72,12 @@ public class SetCommand extends Command {
     return this;
   }
 
+
+  @Override
+  public CommandType getType() {
+    return CommandType.SET;
+  }
+
   private void setExpTime(final int expTime) {
     this.expTime = expTime;
   }
@@ -88,10 +94,18 @@ public class SetCommand extends Command {
     return dataSize;
   }
 
+  public int getFlags() {
+    return flags;
+  }
+
+  public int getExpTime() {
+    return expTime;
+  }
+
   @Override
   public String toString() {
     return "Command {" +
-        "name=" + getName() +
+        "name=" + getType() +
         ", key='" + getKey() + '\'' +
         ", DataSize='" + getDataSize() + '\'' +
         ", Data='" + new String(getData()) + '\'' +

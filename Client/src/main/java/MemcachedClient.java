@@ -28,9 +28,11 @@ public class MemcachedClient {
 
 
     final MemCachedClient mcc = new MemCachedClient(poolName);
-    //add some value in cache
-    LOG.info("Sending set command " + mcc.set("1", "Original"));
+
+    LOG.info("Sending Add command " + mcc.add("1", "Original"));
+    LOG.info("Sending set command " + mcc.set("1", "Original2"));
+    LOG.info("Sending Add command " + mcc.add("1", "Original3"));
     //Get value from cache
-    LOG.info("Get from Cache: " + mcc.get("2"));
+    LOG.info("Get from Cache: " + mcc.get("1"));
   }
 }

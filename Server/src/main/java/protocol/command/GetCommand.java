@@ -10,7 +10,7 @@ import protocol.exception.MemCacheException;
 public class GetCommand extends Command {
 
   public GetCommand(@Nonnull final Cache cache) {
-    super("get", cache);
+    super(cache);
   }
 
   @Override
@@ -27,9 +27,9 @@ public class GetCommand extends Command {
       buff.put(data);
       buff.put(end);
 
-      return new CommandResult(CommandType.GET, buff.array());
+      return new CommandResult(getType(), buff.array());
     } else {
-      return new CommandResult(CommandType.GET, "END\r\n".getBytes());
+      return new CommandResult(getType(), "END\r\n".getBytes());
     }
   }
 
@@ -47,5 +47,10 @@ public class GetCommand extends Command {
     in.skipBytes(2); // \r\n
 
     return this;
+  }
+
+  @Override
+  public CommandType getType() {
+    return CommandType.GET;
   }
 }

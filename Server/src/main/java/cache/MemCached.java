@@ -51,4 +51,17 @@ public final class MemCached implements Cache {
 
     return cache.containsKey(key);
   }
+
+  @Override
+  public boolean add(@Nonnull final CacheEntry entry) {
+    Preconditions.checkArgument(entry != null, "entry can not be null");
+
+    if(contains(entry.getKey())) {
+      return false;
+    }
+
+    set(entry);
+
+    return true;
+  }
 }

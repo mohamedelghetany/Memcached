@@ -10,18 +10,18 @@ public abstract class Command {
   public static final byte DELIMITER_END_OF_LINE = (byte) '\r';
   public static final byte DELIMITER_SPACE = (byte) ' ';
 
-  private final String name;
   private final Cache cache;
   private String key;
 
-  public Command(@Nonnull final String name, @Nonnull final Cache cache) {
-    this.name = name;
+  public Command(@Nonnull final Cache cache) {
     this.cache = cache;
   }
 
   public abstract CommandResult execute() throws MemCacheException;
 
   public abstract Command decode(final ByteBuf in);
+
+  public abstract CommandType getType();
 
   public void setKey(String key) {
     this.key = key;
@@ -31,10 +31,6 @@ public abstract class Command {
     return key;
   }
 
-  public String getName() {
-    return name;
-  }
-
   public Cache getCache() {
     return cache;
   }
@@ -42,7 +38,7 @@ public abstract class Command {
   @Override
   public String toString() {
     return "Command {" +
-        "name=" + name +
+        "name=" + getType() +
         ", key='" + key + '\'' +
         '}';
   }
@@ -54,7 +50,10 @@ public abstract class Command {
         return new GetCommand(cache);
       } else if (CommandType.SET.getStrName().equals(command)) {
         return new SetCommand(cache);
-      } else {
+      } else if (CommandType.ADD.getStrName().equals(command)) {
+        return new AddCommand(cache);
+      }
+      else {
         throw new UnsupportedCommandException(command);
       }
     }
@@ -62,7 +61,8 @@ public abstract class Command {
 
   public enum CommandType {
     GET("get"),
-    SET("set");
+    SET("set"),
+    ADD("add");
 
     private final String strName;
 
