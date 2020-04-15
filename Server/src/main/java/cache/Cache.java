@@ -10,4 +10,6 @@ public interface Cache {
   boolean set(@Nonnull final CacheEntry entry);
 
   boolean add(@Nonnull final CacheEntry entry);
+
+  boolean delete(@Nonnull final CacheEntry entry);
 }

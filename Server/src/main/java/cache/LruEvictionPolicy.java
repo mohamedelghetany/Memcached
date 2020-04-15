@@ -24,7 +24,7 @@ public final class LruEvictionPolicy implements EvictionPolicyListener {
   }
 
   @Override
-  public void accept(@Nonnull final EvictionPolicyMessage message) {
+  public void notify(@Nonnull final EvictionPolicyMessage message) {
     queue.offer(message);
   }
 
@@ -44,7 +44,7 @@ public final class LruEvictionPolicy implements EvictionPolicyListener {
 
           while (count > maxCacheSize) {
             final LinkedCacheEntry linkedCacheEntry = lruList.removeLast();
-            message.getCache().remove(linkedCacheEntry);
+            message.getCache().delete(linkedCacheEntry.getEntry());
             count--;
 
             logger.debug("Evicted " + linkedCacheEntry.toString());

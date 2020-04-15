@@ -29,7 +29,7 @@ public final class MemCached implements Cache {
     }
 
     final LinkedCacheEntry linkedCacheEntry = cache.get(key);
-    policyListener.accept(new EvictionPolicyListener.EvictionPolicyMessage(cache, linkedCacheEntry));
+    policyListener.notify(new EvictionPolicyListener.EvictionPolicyMessage(this, linkedCacheEntry));
 
     return linkedCacheEntry.getEntry();
   }
@@ -40,7 +40,7 @@ public final class MemCached implements Cache {
 
     final LinkedCacheEntry linkedCacheEntry = new LinkedCacheEntry(entry, null, null);
     cache.put(entry.getKey(), linkedCacheEntry);
-    policyListener.accept(new EvictionPolicyListener.EvictionPolicyMessage(cache, linkedCacheEntry));
+    policyListener.notify(new EvictionPolicyListener.EvictionPolicyMessage(this, linkedCacheEntry));
 
     return true;
   }
@@ -61,6 +61,15 @@ public final class MemCached implements Cache {
     }
 
     set(entry);
+
+    return true;
+  }
+
+  @Override
+  public boolean delete(@Nonnull final CacheEntry entry) {
+    Preconditions.checkArgument(entry != null, "entry can not be null");
+
+    cache.remove(entry.getKey());
 
     return true;
   }
