@@ -19,7 +19,7 @@ public final class ServerProperties {
 
   public static PropertyKey<Integer> PORT = new IntegerPropertyKey("port", 11211);
   public static PropertyKey<Integer> maxCacheSize = new IntegerPropertyKey("maxCacheSize", 1000000);
-
+  public static PropertyKey<Integer> cacheStatsReporterIntervalInMS = new IntegerPropertyKey("cacheStatsReporterIntervalInMS", 60000);
 
   public static abstract class PropertyKey<T> {
     private final String key;

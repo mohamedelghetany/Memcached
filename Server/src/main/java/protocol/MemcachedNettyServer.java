@@ -1,6 +1,7 @@
 package protocol;
 
 import cache.Cache;
+import cache.CacheStats;
 import cache.EvictionPolicyListener;
 import cache.LruEvictionPolicy;
 import cache.MemCached;
@@ -52,7 +53,10 @@ public class MemcachedNettyServer {
 
       final ChannelFuture channelFuture = serverBootstrap.bind(port).sync();
 
-      // Wait
+      // Start stats reporter
+      CacheStats.getInstance().initialize();
+
+      // Run & Wait
       logger.info("Starting server at port " + port);
       channelFuture.channel().closeFuture().sync();
     } finally {

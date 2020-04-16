@@ -25,11 +25,13 @@ public final class MemCached implements Cache {
     Preconditions.checkArgument(key != null && !key.isEmpty(), "key can not be null or empty");
 
     if (!cache.containsKey(key)) {
+      CacheStats.getInstance().reportCaheMiss();
       return null;
     }
 
     final LinkedCacheEntry linkedCacheEntry = cache.get(key);
     policyListener.notify(new EvictionPolicyListener.EvictionPolicyMessage(this, linkedCacheEntry));
+    CacheStats.getInstance().reportCacheHit();
 
     return linkedCacheEntry.getEntry();
   }
