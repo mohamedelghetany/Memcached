@@ -4,7 +4,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import protocol.ServerProperties;
 
+/**
+ * Singleton class that contains Statistics about the performance
+ * of a {@link cache.Cache}.
+ *
+ * To get an instance of this class, use {@link CacheStats#getInstance()}
+ * Call {@link CacheStats#initialize()} to reset statistics
+ *
+ * This class also starts a {@link StatsReporter} thread once an instance created.
+ * This thread reports Cache Stats every {@link ServerProperties#cacheStatsReporterIntervalInMS}.
+ * Currently the reporter just Logs but that can be changed to publish to any additional monitoring tools
+ *
+ * Current statistics are:
+ *
+ * {@link CacheStats#hitCount} gets incremented every time a cache hit happen
+ * {@link CacheStats#misCount} gets incremented every time a cache miss happen
+ * {@link CacheStats#evictionCount} gets incremented every time an entry gets evicted
+ */
 public class CacheStats {
+
   private static CacheStats INSTANCE = null;
   private AtomicInteger hitCount = new AtomicInteger();
   private AtomicInteger misCount = new AtomicInteger();
@@ -12,6 +30,7 @@ public class CacheStats {
 
   private CacheStats() {
     final Thread statsReporterThread = new Thread(new StatsReporter());
+    statsReporterThread.setName("CacheStats-StatsReporter");
     statsReporterThread.start();
   }
 

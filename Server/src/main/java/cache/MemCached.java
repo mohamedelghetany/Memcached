@@ -8,18 +8,29 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 
+/**
+ * Basic implementation of {@link Cache}.
+ * {@link ConcurrentHashMap} is the backbone of this implementation
+ *
+ * Here we are using {@link ConcurrentHashMap} and not Synchronized {@link java.util.HashMap}
+ * or a {@link java.util.Hashtable} because a concurrent collection is thread-safe, but not governed by
+ * a single exclusion lock. In the particular case of ConcurrentHashMap, it safely permits any number of concurrent
+ * reads as well as a tunable number of concurrent writes.
+ * "Synchronized" classes can be useful when you need to prevent all access to a collection via a single lock,
+ * at the expense of poorer scalability. In other cases in which multiple threads are expected to access a common
+ * collection, "concurrent" versions are normally preferable.
+ *
+ * More Details: https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/package-summary.html#MemoryVisibility
+ *
+ * Also Chaining in case of collision is handled by either using LinkedList (worst case O(n)) or
+ * Balanced tree (worst case O(log n)). Depends on TREEIFY_THRESHOLD
+ */
 public final class MemCached implements Cache {
   private final Map<String, LinkedCacheEntry> cache;
   private final EvictionPolicyListener policyListener;
 
   public MemCached(final int maxCacheSize, @Nonnull final EvictionPolicyListener policyListener) {
     this.policyListener = policyListener;
-    // Using Concurrent HasMap instead of HashTable or Synchronized HashMap.
-    // A concurrent collection is thread-safe, but not governed by a single exclusion lock. In the particular case of ConcurrentHashMap, it safely permits any number of concurrent reads as well
-    // as a tunable number of concurrent writes. "Synchronized" classes can be useful when you need to prevent all access to a collection via a single lock, at the expense of poorer scalability.
-    // In other cases in which multiple threads are expected to access a common collection, "concurrent" versions are normally preferable.
-    // More Details: https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/package-summary.html#MemoryVisibility
-    // Also Chaining is handled by either using LinkedList (worst case O(n) or Balanced tree (worst case O(log n).
     this.cache = new ConcurrentHashMap<>(maxCacheSize);
   }
 
@@ -56,7 +67,7 @@ public final class MemCached implements Cache {
 
   @Override
   public boolean contains(@Nonnull final CacheEntry entry) {
-    Preconditions.checkArgument(entry != null,"entry can not be null");
+    Preconditions.checkArgument(entry != null, "entry can not be null");
 
     return cache.containsKey(entry.getKey());
   }
@@ -65,7 +76,7 @@ public final class MemCached implements Cache {
   public boolean add(@Nonnull final CacheEntry entry) {
     Preconditions.checkArgument(entry != null, "entry can not be null");
 
-    if(contains(entry)) {
+    if (contains(entry)) {
       return false;
     }
 
@@ -78,7 +89,7 @@ public final class MemCached implements Cache {
   public boolean replace(@Nonnull CacheEntry entry) {
     Preconditions.checkArgument(entry != null, "entry can not be null");
 
-    if(!contains(entry)) {
+    if (!contains(entry)) {
       return false;
     }
 

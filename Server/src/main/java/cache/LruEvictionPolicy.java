@@ -12,7 +12,7 @@ public final class LruEvictionPolicy implements EvictionPolicyListener {
   private final BlockingDeque<Message> queue;
   private final LruLinkedList lruList;
   private final int maxCacheSize;
-  private int count;
+  private int currentCacheSize;
 
   public LruEvictionPolicy(final int maxCacheSize) {
     this(new LinkedBlockingDeque<>(), maxCacheSize);
@@ -48,13 +48,13 @@ public final class LruEvictionPolicy implements EvictionPolicyListener {
           lruList.moveToFirst(message.getEntry());
 
           if (Operation.PUT.equals(message.getOperation())) {
-            count++;
+            currentCacheSize++;
           }
 
-          while (count > maxCacheSize) {
+          while (currentCacheSize > maxCacheSize) {
             final LinkedCacheEntry linkedCacheEntry = lruList.removeLast();
             message.getCache().delete(linkedCacheEntry.getEntry());
-            count--;
+            currentCacheSize--;
             CacheStats.getInstance().reportEviction();
             logger.debug("Evicted " + linkedCacheEntry.toString());
           }
