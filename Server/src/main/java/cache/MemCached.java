@@ -1,5 +1,8 @@
 package cache;
 
+import static cache.EvictionPolicyListener.*;
+
+import cache.EvictionPolicyListener.Operation;
 import com.google.common.base.Preconditions;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,12 +28,12 @@ public final class MemCached implements Cache {
     Preconditions.checkArgument(key != null && !key.isEmpty(), "key can not be null or empty");
 
     if (!cache.containsKey(key)) {
-      CacheStats.getInstance().reportCaheMiss();
+      CacheStats.getInstance().reportCacheMiss();
       return null;
     }
 
     final LinkedCacheEntry linkedCacheEntry = cache.get(key);
-    policyListener.notify(new EvictionPolicyListener.EvictionPolicyMessage(this, linkedCacheEntry));
+    policyListener.notify(new Message(this, linkedCacheEntry, Operation.GET));
     CacheStats.getInstance().reportCacheHit();
 
     return linkedCacheEntry.getEntry();
@@ -40,29 +43,49 @@ public final class MemCached implements Cache {
   public boolean set(@Nonnull final CacheEntry entry) {
     Preconditions.checkArgument(entry != null, "entry can not be null");
 
+    if (contains(entry)) {
+      return replace(entry);
+    }
+
     final LinkedCacheEntry linkedCacheEntry = new LinkedCacheEntry(entry, null, null);
     cache.put(entry.getKey(), linkedCacheEntry);
-    policyListener.notify(new EvictionPolicyListener.EvictionPolicyMessage(this, linkedCacheEntry));
+    policyListener.notify(new Message(this, linkedCacheEntry, Operation.PUT));
 
     return true;
   }
 
   @Override
-  public boolean contains(@Nonnull final String key) {
-    Preconditions.checkArgument(key != null && !key.isEmpty(), "key can not be null or empty");
+  public boolean contains(@Nonnull final CacheEntry entry) {
+    Preconditions.checkArgument(entry != null,"entry can not be null");
 
-    return cache.containsKey(key);
+    return cache.containsKey(entry.getKey());
   }
 
   @Override
   public boolean add(@Nonnull final CacheEntry entry) {
     Preconditions.checkArgument(entry != null, "entry can not be null");
 
-    if(contains(entry.getKey())) {
+    if(contains(entry)) {
       return false;
     }
 
     set(entry);
+
+    return true;
+  }
+
+  @Override
+  public boolean replace(@Nonnull CacheEntry entry) {
+    Preconditions.checkArgument(entry != null, "entry can not be null");
+
+    if(!contains(entry)) {
+      return false;
+    }
+
+    final LinkedCacheEntry linkedCacheEntry = cache.get(entry.getKey());
+    linkedCacheEntry.setEntry(entry);
+    cache.put(entry.getKey(), linkedCacheEntry);
+    policyListener.notify(new Message(this, linkedCacheEntry, Operation.GET));
 
     return true;
   }

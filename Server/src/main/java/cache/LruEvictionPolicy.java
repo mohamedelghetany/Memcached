@@ -1,5 +1,6 @@
 package cache;
 
+import com.google.common.annotations.VisibleForTesting;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import javax.annotation.Nonnull;
@@ -8,14 +9,19 @@ import org.apache.log4j.Logger;
 public final class LruEvictionPolicy implements EvictionPolicyListener {
   private static final Logger logger = Logger.getLogger(LruEvictionPolicy.class);
 
-  private final BlockingDeque<EvictionPolicyMessage> queue;
+  private final BlockingDeque<Message> queue;
   private final LruLinkedList lruList;
   private final int maxCacheSize;
   private int count;
 
   public LruEvictionPolicy(final int maxCacheSize) {
+    this(new LinkedBlockingDeque<>(), maxCacheSize);
+  }
+
+  @VisibleForTesting
+  public LruEvictionPolicy(final @Nonnull BlockingDeque<Message> queue, final int maxCacheSize) {
+    this.queue = queue;
     this.maxCacheSize = maxCacheSize;
-    this.queue = new LinkedBlockingDeque<>();
     lruList = new LruLinkedList();
 
     final Thread thread = new Thread(new LruWorker());
@@ -24,7 +30,7 @@ public final class LruEvictionPolicy implements EvictionPolicyListener {
   }
 
   @Override
-  public void notify(@Nonnull final EvictionPolicyMessage message) {
+  public void notify(@Nonnull final Message message) {
     queue.offer(message);
   }
 
@@ -36,17 +42,20 @@ public final class LruEvictionPolicy implements EvictionPolicyListener {
 
       while (true) {
         try {
-          final EvictionPolicyMessage message = queue.take();
-          logger.debug("Deque message " + message.getEntry());
+          final Message message = queue.take();
+          logger.info("Deque message " + message.getEntry());
 
           lruList.moveToFirst(message.getEntry());
-          count++;
+
+          if (Operation.PUT.equals(message.getOperation())) {
+            count++;
+          }
 
           while (count > maxCacheSize) {
             final LinkedCacheEntry linkedCacheEntry = lruList.removeLast();
             message.getCache().delete(linkedCacheEntry.getEntry());
             count--;
-
+            CacheStats.getInstance().reportEviction();
             logger.debug("Evicted " + linkedCacheEntry.toString());
           }
 

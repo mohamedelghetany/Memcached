@@ -8,6 +8,7 @@ public class CacheStats {
   private static CacheStats INSTANCE = null;
   private AtomicInteger hitCount = new AtomicInteger();
   private AtomicInteger misCount = new AtomicInteger();
+  private AtomicInteger evictionCount = new AtomicInteger();
 
   private CacheStats() {
     final Thread statsReporterThread = new Thread(new StatsReporter());
@@ -29,14 +30,19 @@ public class CacheStats {
   public void initialize() {
     hitCount.set(0);
     misCount.set(0);
+    evictionCount.set(0);
   }
 
   public void reportCacheHit() {
     hitCount.addAndGet(1);
   }
 
-  public void reportCaheMiss() {
+  public void reportCacheMiss() {
     misCount.addAndGet(1);
+  }
+
+  public void reportEviction() {
+    evictionCount.addAndGet(1);
   }
 
   public AtomicInteger getHitCount() {
@@ -45,6 +51,10 @@ public class CacheStats {
 
   public AtomicInteger getMisCount() {
     return misCount;
+  }
+
+  public AtomicInteger getEvictionCount() {
+    return evictionCount;
   }
 
   public static class StatsReporter implements Runnable {
@@ -56,9 +66,10 @@ public class CacheStats {
         logger.info("Starting CacheStats reporter");
 
         while (true) {
-          final String report = String.format("CacheStats - Hit Count: %d, Miss Count: %d",
+          final String report = String.format("CacheStats - Hit Count: %d, Miss Count: %d, Evicted: %d",
               CacheStats.getInstance().getHitCount().get(),
-              CacheStats.getInstance().getMisCount().get());
+              CacheStats.getInstance().getMisCount().get(),
+              CacheStats.getInstance().getEvictionCount().get());
 
           logger.info(report);
 

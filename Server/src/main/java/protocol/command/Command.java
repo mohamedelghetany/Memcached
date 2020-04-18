@@ -52,8 +52,9 @@ public abstract class Command {
         return new SetCommand(cache);
       } else if (CommandType.ADD.getStrName().equals(command)) {
         return new AddCommand(cache);
-      }
-      else {
+      } else if (CommandType.REPLACE.getStrName().equals(command)) {
+        return new ReplaceCommand(cache);
+      } else {
         throw new UnsupportedCommandException(command);
       }
     }
@@ -62,7 +63,8 @@ public abstract class Command {
   public enum CommandType {
     GET("get"),
     SET("set"),
-    ADD("add");
+    ADD("add"),
+    REPLACE("replace");
 
     private final String strName;
 
@@ -95,8 +97,8 @@ public abstract class Command {
     @Override
     public String toString() {
       return "CommandResult: {" +
-             " Type: " + getType() +
-             " ResultValue:  " + new String(getResultValue()) +
+          " Type: " + getType() +
+          " ResultValue:  " + new String(getResultValue()) +
           "}";
     }
   }

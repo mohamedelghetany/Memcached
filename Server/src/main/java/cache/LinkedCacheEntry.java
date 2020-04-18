@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 public final class LinkedCacheEntry {
   private LinkedCacheEntry next;
   private LinkedCacheEntry previous;
-  private final CacheEntry entry;
+  private CacheEntry entry;
 
   public LinkedCacheEntry(@Nonnull final CacheEntry entry, @Nullable final LinkedCacheEntry next, @Nullable final LinkedCacheEntry previous) {
     this.next = next;
@@ -38,5 +38,9 @@ public final class LinkedCacheEntry {
 
   public void setPrevious(LinkedCacheEntry previous) {
     this.previous = previous;
+  }
+
+  public void setEntry(@Nonnull final CacheEntry entry) {
+    this.entry = entry;
   }
 }

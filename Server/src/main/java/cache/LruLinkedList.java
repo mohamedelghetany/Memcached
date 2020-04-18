@@ -1,6 +1,9 @@
 package cache;
 
+import org.apache.log4j.Logger;
+
 public final class LruLinkedList {
+  private static final Logger logger = Logger.getLogger(LruLinkedList.class);
   private LinkedCacheEntry head = null;
   private LinkedCacheEntry tail = null;
 
@@ -21,6 +24,10 @@ public final class LruLinkedList {
       previous.setNext(entry.getNext());
     }
 
+    if(tail == entry) {
+      tail = entry.getNext();
+    }
+
     entry.setNext(null);
     entry.setPrevious(head);
     head.setNext(entry);
@@ -30,12 +37,11 @@ public final class LruLinkedList {
   public LinkedCacheEntry removeLast() {
     final LinkedCacheEntry last = tail;
     tail = tail.getNext();
+
+    tail.setPrevious(null);
     last.setNext(null);
+    last.setPrevious(null);
 
     return last;
-  }
-
-  private boolean isEmpty() {
-    return head == null;
   }
 }
