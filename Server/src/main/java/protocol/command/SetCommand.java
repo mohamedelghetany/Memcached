@@ -4,7 +4,6 @@ import cache.Cache;
 import cache.CacheEntry;
 import io.netty.buffer.ByteBuf;
 import javax.annotation.Nonnull;
-import protocol.exception.MemCacheException;
 
 public class SetCommand extends Command {
   private int dataSize;
@@ -17,7 +16,7 @@ public class SetCommand extends Command {
   }
 
   @Override
-  public CommandResult execute() throws MemCacheException {
+  public CommandResult executeInternal() {
     final CacheEntry entry = new CacheEntry(getKey(), getData(), getFlags(), getExpTime());
     final boolean setResult = getCache().set(entry);
     final String strResult = setResult ? STORED : SERVER_ERROR;
@@ -30,7 +29,7 @@ public class SetCommand extends Command {
    * 2- <data block>\r\n
    */
   @Override
-  public Command decode(ByteBuf in) {
+  public Command decodeInternal(ByteBuf in) {
     // Key
     int length = in.bytesBefore(DELIMITER_SPACE);
     setKey(read(in, length));

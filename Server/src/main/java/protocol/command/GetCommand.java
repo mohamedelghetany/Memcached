@@ -5,7 +5,6 @@ import cache.CacheEntry;
 import io.netty.buffer.ByteBuf;
 import java.nio.ByteBuffer;
 import javax.annotation.Nonnull;
-import protocol.exception.MemCacheException;
 
 public class GetCommand extends Command {
 
@@ -14,7 +13,7 @@ public class GetCommand extends Command {
   }
 
   @Override
-  public CommandResult execute() throws MemCacheException {
+  public CommandResult executeInternal() {
     final CacheEntry entry = getCache().get(getKey());
 
     if (entry != null) {
@@ -37,7 +36,7 @@ public class GetCommand extends Command {
    * Example: get <key>*\r\n
    */
   @Override
-  public Command decode(ByteBuf in) {
+  public Command decodeInternal(ByteBuf in) {
     final int length = in.bytesBefore(DELIMITER_END_OF_LINE);
     final byte[] bytes = new byte[length];
     in.readBytes(bytes);

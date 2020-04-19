@@ -17,7 +17,7 @@ public class OutputEncoder extends MessageToByteEncoder<Command.CommandResult> {
   private static final Logger logger = Logger.getLogger(OutputEncoder.class);
 
   @Override
-  protected void encode(ChannelHandlerContext ctx, Command.CommandResult commandResult, ByteBuf out) throws Exception {
+  protected void encode(ChannelHandlerContext ctx, Command.CommandResult commandResult, ByteBuf out) {
     logger.debug(commandResult.toString());
 
     out.writeBytes(commandResult.getResultValue());

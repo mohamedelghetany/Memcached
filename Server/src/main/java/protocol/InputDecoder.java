@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import protocol.command.Command;
+import protocol.exception.MemCachedException;
 import protocol.exception.UnsupportedCommandException;
 
 /**
@@ -43,7 +44,7 @@ public class InputDecoder extends ReplayingDecoder<Void> {
   }
 
   @Override
-  protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) throws UnsupportedCommandException {
+  protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) throws MemCachedException {
     final int length = in.bytesBefore(Command.DELIMITER_SPACE);
     final byte[] bytes = new byte[length];
     in.readBytes(bytes);

@@ -3,7 +3,9 @@ package protocol.command;
 import cache.Cache;
 import io.netty.buffer.ByteBuf;
 import javax.annotation.Nonnull;
-import protocol.exception.MemCacheException;
+import protocol.exception.CommandDecodingException;
+import protocol.exception.CommandExecutionException;
+import protocol.exception.MemCachedException;
 import protocol.exception.UnsupportedCommandException;
 
 /**
@@ -23,9 +25,25 @@ public abstract class Command {
     this.cache = cache;
   }
 
-  public abstract CommandResult execute() throws MemCacheException;
+  public CommandResult execute() throws MemCachedException {
+    try {
+      return executeInternal();
+    }catch (final Exception e) {
+      throw new CommandExecutionException(e);
+    }
+  }
 
-  public abstract Command decode(final ByteBuf in);
+  public Command decode(@Nonnull final ByteBuf in) throws MemCachedException {
+    try {
+      return decodeInternal(in);
+    }catch (final Exception e) {
+      throw new CommandDecodingException(e);
+    }
+  }
+
+  protected abstract CommandResult executeInternal();
+
+  protected abstract Command decodeInternal(@Nonnull final ByteBuf in);
 
   public abstract CommandType getType();
 
