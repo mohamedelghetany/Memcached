@@ -2,8 +2,8 @@ package protocol;
 
 import cache.Cache;
 import cache.CacheStats;
-import cache.EvictionPolicyListener;
-import cache.LruEvictionPolicy;
+import cache.EvictionPolicyMessageBus;
+import cache.EvictionPolicyMessageBusImpl;
 import cache.MemCached;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -45,7 +45,7 @@ public class MemcachedNettyServer {
 
     try {
       final Integer maxCacheSize = ServerProperties.maxCacheSize.get();
-      final EvictionPolicyListener policy = new LruEvictionPolicy(maxCacheSize);
+      final EvictionPolicyMessageBus policy = new EvictionPolicyMessageBusImpl(maxCacheSize);
       final Cache cache = new MemCached(maxCacheSize, policy);
 
       final ServerBootstrap serverBootstrap = new ServerBootstrap();

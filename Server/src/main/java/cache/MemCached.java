@@ -1,8 +1,8 @@
 package cache;
 
-import static cache.EvictionPolicyListener.*;
+import static cache.EvictionPolicyMessageBus.*;
 
-import cache.EvictionPolicyListener.Operation;
+import cache.EvictionPolicyMessageBus.Operation;
 import com.google.common.base.Preconditions;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,10 +27,10 @@ import javax.annotation.Nonnull;
  */
 public final class MemCached implements Cache {
   private final Map<String, LinkedCacheEntry> cache;
-  private final EvictionPolicyListener policyListener;
+  private final EvictionPolicyMessageBus policyMessageBus;
 
-  public MemCached(final int maxCacheSize, @Nonnull final EvictionPolicyListener policyListener) {
-    this.policyListener = policyListener;
+  public MemCached(final int maxCacheSize, @Nonnull final EvictionPolicyMessageBus policyMessageBus) {
+    this.policyMessageBus = policyMessageBus;
     this.cache = new ConcurrentHashMap<>(maxCacheSize);
   }
 
@@ -44,7 +44,7 @@ public final class MemCached implements Cache {
     }
 
     final LinkedCacheEntry linkedCacheEntry = cache.get(key);
-    policyListener.notify(new Message(this, linkedCacheEntry, Operation.GET));
+    policyMessageBus.publish(new Message(this, linkedCacheEntry, Operation.GET));
     CacheStats.getInstance().reportCacheHit();
 
     return linkedCacheEntry.getEntry();
@@ -60,7 +60,7 @@ public final class MemCached implements Cache {
 
     final LinkedCacheEntry linkedCacheEntry = new LinkedCacheEntry(entry, null, null);
     cache.put(entry.getKey(), linkedCacheEntry);
-    policyListener.notify(new Message(this, linkedCacheEntry, Operation.PUT));
+    policyMessageBus.publish(new Message(this, linkedCacheEntry, Operation.ADD));
 
     return true;
   }
@@ -96,7 +96,7 @@ public final class MemCached implements Cache {
     final LinkedCacheEntry linkedCacheEntry = cache.get(entry.getKey());
     linkedCacheEntry.setEntry(entry);
     cache.put(entry.getKey(), linkedCacheEntry);
-    policyListener.notify(new Message(this, linkedCacheEntry, Operation.GET));
+    policyMessageBus.publish(new Message(this, linkedCacheEntry, Operation.MODIFY));
 
     return true;
   }
