@@ -14,7 +14,7 @@ public class AddCommand extends SetCommand {
   public CommandResult execute() throws MemCacheException {
     final CacheEntry entry = new CacheEntry(getKey(), getData(), getFlags(), getExpTime());
     final boolean addResult = getCache().add(entry);
-    final String strResult = addResult ? "STORED\r\n" : "NOT_STORED\r\n";
+    final String strResult = addResult ? STORED : NOT_STORED;
 
     return new CommandResult(getType(), strResult.getBytes());
   }

@@ -6,9 +6,15 @@ import javax.annotation.Nonnull;
 import protocol.exception.MemCacheException;
 import protocol.exception.UnsupportedCommandException;
 
+/**
+ * Base class for all supported Commands.
+ */
 public abstract class Command {
   public static final byte DELIMITER_END_OF_LINE = (byte) '\r';
   public static final byte DELIMITER_SPACE = (byte) ' ';
+  protected final static String STORED = "STORED\r\n";
+  protected final static String SERVER_ERROR ="SERVER_ERROR\r\n";
+  protected static final String NOT_STORED = "NOT_STORED\r\n";;
 
   private final Cache cache;
   private String key;

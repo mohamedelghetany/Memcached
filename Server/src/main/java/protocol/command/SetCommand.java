@@ -20,7 +20,7 @@ public class SetCommand extends Command {
   public CommandResult execute() throws MemCacheException {
     final CacheEntry entry = new CacheEntry(getKey(), getData(), getFlags(), getExpTime());
     final boolean setResult = getCache().set(entry);
-    final String strResult = setResult ? "STORED\r\n" : "SERVER_ERROR\r\n";
+    final String strResult = setResult ? STORED : SERVER_ERROR;
 
     return new CommandResult(getType(), strResult.getBytes());
   }

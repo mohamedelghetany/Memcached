@@ -16,7 +16,17 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 
-// Based on https://github.com/netty/netty/wiki/User-guide-for-4.x
+/**
+ * The main Netty Server class. Encapsulates the main function and
+ * all Netty server initialization.
+ *
+ * One thing to look for is that we init the Netty worker pool to the number of
+ * available processors returned by {@link Runtime#getRuntime().availableProcessors()}
+ *
+ * This is based on the examples at
+ *
+ * https://github.com/netty/netty/wiki/User-guide-for-4.x
+ */
 public class MemcachedNettyServer {
   private static final Logger logger = Logger.getLogger(MemcachedNettyServer.class);
   private final int port;
@@ -57,7 +67,7 @@ public class MemcachedNettyServer {
       CacheStats.getInstance().initialize();
 
       // Run & Wait
-      logger.info("Starting server at port " + port);
+      logger.info(String.format("Starting server on Port %d ", port));
       channelFuture.channel().closeFuture().sync();
     } finally {
       workerGroup.shutdownGracefully();
@@ -72,7 +82,7 @@ public class MemcachedNettyServer {
 
     final int availableProcessorsCount = Runtime.getRuntime().availableProcessors();
 
-    logger.debug("Available processors count: " + availableProcessorsCount);
+    logger.debug(String.format("Found %d available processors", availableProcessorsCount));
 
     new MemcachedNettyServer(port, availableProcessorsCount).initAndRun();
   }
