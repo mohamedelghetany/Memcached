@@ -41,7 +41,7 @@ public class EvictionPolicyLRUWorker implements Runnable {
     while (condition.get()) {
       try {
         final EvictionPolicyMessageBus.Message message = messageBus.fetch();
-        logger.info("Deque message " + message.getEntry());
+        logger.debug("Deque message " + message.getEntry());
 
         lruList.moveToFirst(message.getEntry());
 
