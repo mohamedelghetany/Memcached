@@ -2,6 +2,7 @@ package protocol;
 
 import cache.Cache;
 import cache.CacheStats;
+import cache.EvictionPolicyLRUWorker;
 import cache.EvictionPolicyMessageBus;
 import cache.EvictionPolicyMessageBusImpl;
 import cache.MemCached;
@@ -45,8 +46,10 @@ public class MemcachedNettyServer {
 
     try {
       final Integer maxCacheSize = ServerProperties.maxCacheSize.get();
-      final EvictionPolicyMessageBus policy = new EvictionPolicyMessageBusImpl(maxCacheSize);
-      final Cache cache = new MemCached(maxCacheSize, policy);
+      final EvictionPolicyMessageBus evictionMessageBus = new EvictionPolicyMessageBusImpl(maxCacheSize);
+      final Cache cache = new MemCached(evictionMessageBus, maxCacheSize);
+      final Thread evictionWorker = new Thread(new EvictionPolicyLRUWorker(evictionMessageBus, maxCacheSize), "EvictionPolicyLRUWorker-Thread");
+      evictionWorker.start();
 
       final ServerBootstrap serverBootstrap = new ServerBootstrap();
       serverBootstrap.group(bossGroup, workerGroup);

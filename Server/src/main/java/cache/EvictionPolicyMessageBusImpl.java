@@ -15,14 +15,15 @@ public final class EvictionPolicyMessageBusImpl implements EvictionPolicyMessage
   @VisibleForTesting
   public EvictionPolicyMessageBusImpl(final @Nonnull BlockingDeque<Message> queue, final int maxCacheSize) {
     this.queue = queue;
-
-    final Thread thread = new Thread(new EvictionPolicyLRUWorker(queue, maxCacheSize));
-    thread.setName("LRU-Worker thread");
-    thread.start();
   }
 
   @Override
   public void publish(@Nonnull final Message message) {
     queue.offer(message);
+  }
+
+  @Override
+  public Message fetch() throws InterruptedException {
+    return queue.take();
   }
 }

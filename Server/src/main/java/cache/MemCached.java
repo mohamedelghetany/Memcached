@@ -27,10 +27,10 @@ import javax.annotation.Nonnull;
  */
 public final class MemCached implements Cache {
   private final Map<String, LinkedCacheEntry> cache;
-  private final EvictionPolicyMessageBus policyMessageBus;
+  private final EvictionPolicyMessageBus evictionMessageBus;
 
-  public MemCached(final int maxCacheSize, @Nonnull final EvictionPolicyMessageBus policyMessageBus) {
-    this.policyMessageBus = policyMessageBus;
+  public MemCached(@Nonnull final EvictionPolicyMessageBus evictionMessageBus, final int maxCacheSize) {
+    this.evictionMessageBus = evictionMessageBus;
     this.cache = new ConcurrentHashMap<>(maxCacheSize);
   }
 
@@ -44,7 +44,7 @@ public final class MemCached implements Cache {
     }
 
     final LinkedCacheEntry linkedCacheEntry = cache.get(key);
-    policyMessageBus.publish(new Message(this, linkedCacheEntry, Operation.GET));
+    evictionMessageBus.publish(new Message(this, linkedCacheEntry, Operation.GET));
     CacheStats.getInstance().reportCacheHit();
 
     return linkedCacheEntry.getEntry();
@@ -60,7 +60,7 @@ public final class MemCached implements Cache {
 
     final LinkedCacheEntry linkedCacheEntry = new LinkedCacheEntry(entry, null, null);
     cache.put(entry.getKey(), linkedCacheEntry);
-    policyMessageBus.publish(new Message(this, linkedCacheEntry, Operation.ADD));
+    evictionMessageBus.publish(new Message(this, linkedCacheEntry, Operation.ADD));
 
     return true;
   }
@@ -96,7 +96,7 @@ public final class MemCached implements Cache {
     final LinkedCacheEntry linkedCacheEntry = cache.get(entry.getKey());
     linkedCacheEntry.setEntry(entry);
     cache.put(entry.getKey(), linkedCacheEntry);
-    policyMessageBus.publish(new Message(this, linkedCacheEntry, Operation.MODIFY));
+    evictionMessageBus.publish(new Message(this, linkedCacheEntry, Operation.MODIFY));
 
     return true;
   }

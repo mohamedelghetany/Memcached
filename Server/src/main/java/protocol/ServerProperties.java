@@ -24,7 +24,7 @@ public final class ServerProperties {
   private ServerProperties() {
   }
 
-  public static void initialize() throws IOException {
+  public static void initialize() {
     try {
       logger.debug("Initializing ServerProperties...");
       final FileInputStream in = new FileInputStream(ServerProperties.class.getClassLoader().getResource("").getPath() + "config.properties");

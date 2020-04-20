@@ -6,6 +6,8 @@ public interface EvictionPolicyMessageBus {
 
   void publish(@Nonnull final Message message);
 
+  Message fetch() throws InterruptedException;
+
   /**
    * The notification message that used when notifying Eviction policy about
    * the updates in the cache.

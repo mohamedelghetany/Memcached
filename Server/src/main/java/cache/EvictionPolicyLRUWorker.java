@@ -3,7 +3,8 @@ package cache;
 import static cache.EvictionPolicyMessageBus.Operation.ADD;
 
 import com.google.common.annotations.VisibleForTesting;
-import java.util.concurrent.BlockingDeque;
+import com.google.common.base.Preconditions;
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.apache.log4j.Logger;
 
@@ -12,12 +13,15 @@ public class EvictionPolicyLRUWorker implements Runnable {
 
   private final LruLinkedList lruList;
   private final int maxCacheSize;
-  private final BlockingDeque<EvictionPolicyMessageBus.Message> queue;
   private int currentCacheSize;
+  private final EvictionPolicyMessageBus messageBus;
 
   @VisibleForTesting
-  public EvictionPolicyLRUWorker(final @Nonnull BlockingDeque<EvictionPolicyMessageBus.Message> queue, final int maxCacheSize) {
-    this.queue = queue;
+  public EvictionPolicyLRUWorker(@Nonnull final EvictionPolicyMessageBus messageBus, final int maxCacheSize) {
+    Preconditions.checkArgument(messageBus != null, "messageBus can not be null");
+    Preconditions.checkArgument(maxCacheSize >= 0, "maxCacheSize can not be < 0");
+
+    this.messageBus = messageBus;
     this.maxCacheSize = maxCacheSize;
     lruList = new LruLinkedList();
   }
@@ -25,10 +29,18 @@ public class EvictionPolicyLRUWorker implements Runnable {
   @Override
   public void run() {
     logger.info("Starting EvictionPolicyLRUWorker thread....");
+    run(() -> true);
+  }
 
-    while (true) {
+  /**
+   * Keep running in a loop while the given condition is true!
+   *
+   * @param condition the condition when meet Run will end (the thread will stop)
+   */
+  public void run(@Nonnull final Supplier<Boolean> condition) {
+    while (condition.get()) {
       try {
-        final EvictionPolicyMessageBus.Message message = queue.take();
+        final EvictionPolicyMessageBus.Message message = messageBus.fetch();
         logger.info("Deque message " + message.getEntry());
 
         lruList.moveToFirst(message.getEntry());
