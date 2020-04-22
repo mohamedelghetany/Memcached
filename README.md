@@ -30,7 +30,7 @@ From Server folder run the following maven command: `mvn install`
 From Server folder run the following maven command: `mvn exec:java`
 
 ## Changing Log Level
-To enable server debug logs set `level="debug"` in [log4j2.xml](./server/src/main/resources/log4j2.xml)
+To enable server debug logs set `level="debug"` in [log4j2.xml](./Server/src/main/resources/log4j2.xml)
 
 You will need to rebuild the server : `mvn install`
 
@@ -38,7 +38,7 @@ Note: `level="debug"` is very verbose so setting log level to `debug` will have 
 
 ## Changing Server Configuration
 
-Configuration is based on Java Properties file [config.properties](./server/src/main/resources/config.properties)
+Configuration is based on Java Properties file [config.properties](./Server/src/main/resources/config.properties)
 
 All configration have default values, these values are specified at [ServerProperties.java](./Server/src/main/java/protocol/ServerProperties.java) 
 
