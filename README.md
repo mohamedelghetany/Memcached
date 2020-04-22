@@ -30,7 +30,7 @@ From Server folder run the following maven command: `mvn install`
 From Server folder run the following maven command: `mvn exec:java`
 
 ## Changing Log Level
-To enable server debug logs set `level="debug"` in [log4j2.xml](./Server/src/main/resources/log4j2.xml)
+To enable server debug logs set `level="debug"` in [log4j2.xml](./Server/src/main/resources/log4j.properties)
 
 You will need to rebuild the server : `mvn install`
 
