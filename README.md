@@ -82,6 +82,11 @@ Env:
   * Processor: 2.4 GHz 8-Core Intel Core i9
   * Memory: 64 GB 2667 MHz DDR4
 
+**Note: Both YCSB Client and Server are running on the same machine**
+
+This table shows a quick run of **Load** and **Run** using **YCSB** targeting both my new cache and memcached. 
+It is for 1000000 operations (records)
+
 |          | My Server                                                    | Memcached                                                    |
 | :------- | :----------------------------------------------------------- | ------------------------------------------------------------ |
 |          | `mvn exec:java`                                              | `memcached -p 11211 -vv`                                     |
@@ -120,7 +125,7 @@ The difference between the two charts below is
 * The 1st shows the effect of initializing Netty Thread pool (on the server) with the full number of processors available on my mac
 * The 1st shows the effect of initializing Netty Thread pool (on the server) with half of the number of processors available on my mac
 
-You can see that the latency is cut to half when using more threads on the sever. I wanted to get a sense of how the numbers will change if I run my Server in a PROD machine (Not a laptop :)) but since I don't have access to such machine, I decided to simulate it by cutting number of threads I am using :)   
+You can see that the latency is cut to half when using more threads on the sever. I wanted to get a sense of how the numbers will change if more processors are added to the server. One thing to watch out for (that is effecting this experiment) is that both the YCSB client and my server are running on the same machine  
 
 ![image-20200422202458930](./Server/docs/benchmarking/Full_CPU.png)
 
