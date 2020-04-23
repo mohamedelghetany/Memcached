@@ -2,10 +2,30 @@ package cache;
 
 import javax.annotation.Nonnull;
 
+/**
+ * Interface of Eviction Policy MessageBus. This interface exists because we want to decouple Updating the cache from Eviction process
+ *
+ * Order of the messages should be guaranteed, a message1 that is added to the bus before message2 is guaranteed to get consumed first
+ *
+ * The producer for this Bus is {@link Cache}
+ * The consumer for this Bus is Eviction Worker
+ */
 public interface EvictionPolicyMessageBus {
 
+  /**
+   * Publish message to the Bus
+   *
+   * @param message to be published
+   */
   void publish(@Nonnull final Message message);
 
+  /**
+   * Fetch the message form the Bus
+   *
+   * Fetch might Block and wait for a message, depends on the concrete implementation
+   *
+   * @throws InterruptedException
+   */
   Message fetch() throws InterruptedException;
 
   /**

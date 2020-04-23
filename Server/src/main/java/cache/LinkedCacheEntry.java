@@ -4,6 +4,9 @@ package cache;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * An Doubly LinkedList entry. It is used by {@link LruLinkedList}
+ */
 public final class LinkedCacheEntry {
   private LinkedCacheEntry next;
   private LinkedCacheEntry previous;

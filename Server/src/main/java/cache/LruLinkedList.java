@@ -2,6 +2,9 @@ package cache;
 
 import org.apache.log4j.Logger;
 
+/**
+ * Simple Doubly LinkedList of {@link LinkedCacheEntry} that is ued for LRU
+ */
 public final class LruLinkedList {
   private static final Logger logger = Logger.getLogger(LruLinkedList.class);
   private LinkedCacheEntry head = null;

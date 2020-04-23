@@ -14,7 +14,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import java.io.IOException;
 import org.apache.log4j.Logger;
 
 /**
@@ -42,6 +41,7 @@ public class MemcachedNettyServer {
     logger.info("Initializing and running MemcachedNettyServer...");
 
     final EventLoopGroup bossGroup = new NioEventLoopGroup();
+    // This can be changed by -Dio.netty.eventLoopThreads
     final EventLoopGroup workerGroup = new NioEventLoopGroup(availableProcessorsCount);
 
     try {
@@ -58,6 +58,7 @@ public class MemcachedNettyServer {
         protected void initChannel(SocketChannel ch) {
           ch.pipeline().addLast(new InputDecoder(cache));
           ch.pipeline().addLast(new OutputEncoder());
+          // Here in CommandHandler, we can pass an EventExecutorGroup, but for the scope of our sever, I think that will be an overkill
           ch.pipeline().addLast(new CommandHandler());
         }
       });
@@ -78,12 +79,12 @@ public class MemcachedNettyServer {
     }
   }
 
-  public static void main(String[] args) throws InterruptedException, IOException {
+  public static void main(String[] args) throws InterruptedException {
     ServerProperties.initialize();
 
     final int port = ServerProperties.PORT.get();
 
-    final int availableProcessorsCount = Runtime.getRuntime().availableProcessors();
+    final int availableProcessorsCount = Runtime.getRuntime().availableProcessors() * 2;
 
     logger.debug(String.format("Found %d available processors", availableProcessorsCount));
 

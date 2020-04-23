@@ -8,6 +8,10 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import org.apache.log4j.Logger;
 
+/**
+ * An LRU single worker thread that will consume from {@link EvictionPolicyMessageBus} and apply the necessary LRU changes on the
+ * underlying LinkedList {@link LruLinkedList}
+ */
 public class EvictionPolicyLRUWorker implements Runnable {
   private static Logger logger = Logger.getLogger(EvictionPolicyLRUWorker.class);
 

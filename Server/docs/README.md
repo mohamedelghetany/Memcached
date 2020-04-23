@@ -36,3 +36,25 @@ So there are two packages under **'Server'** folder
 
   
 
+# Monitoring 
+
+Currently Server monitoring is limitted. We only have a thread that runs every X mins (default is 1 min) and will "report"* CacheStats. 
+
+CacheStats currenly has, HitCount, MissCount, EvictionCount 
+
+`[CacheStats-StatsReporter] cache.CacheStats$StatsReporter  - CacheStats - Hit Count: 0, Miss Count: 0, Evicted: 0`
+
+*"Report" in the current system means Log, but that can be changed to publish these KPIs to another service and setup alerting around it 
+
+# V2 and the future
+
+* Add eviction by memory pressure a long with number of keys 
+
+* [In Progress] Performance tweeking and finding the bottelnecks 
+
+* [Future] Add more monitoring 
+
+* [Future] Add cache partitioning to my design, basically partition the cache to multiple caches and each cach will have its own eviction worker. 
+
+  
+

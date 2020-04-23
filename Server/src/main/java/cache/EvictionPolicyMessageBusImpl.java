@@ -5,6 +5,11 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import javax.annotation.Nonnull;
 
+/**
+ * Implementation of {@link EvictionPolicyMessageBus}
+ *
+ * Internally it uses {@link BlockingDeque} so the consumer thread ({@link EvictionPolicyLRUWorker}) will block and wait when the queue is empty
+ */
 public final class EvictionPolicyMessageBusImpl implements EvictionPolicyMessageBus {
   private final BlockingDeque<Message> queue;
 
