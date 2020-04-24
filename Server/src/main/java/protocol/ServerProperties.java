@@ -74,7 +74,12 @@ public final class ServerProperties {
         return getDefaultValue();
       }
 
-      return Integer.valueOf(value);
+      try {
+        return Integer.valueOf(value);
+      }catch (final NumberFormatException e) {
+        logger.error(String.format("Could not load Property. Defaulting to the default value. PropertyName: %s, InputValue: %s", getKey(), value));
+        return getDefaultValue();
+      }
     }
   }
 }
