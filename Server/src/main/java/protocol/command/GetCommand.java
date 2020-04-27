@@ -2,6 +2,7 @@ package protocol.command;
 
 import cache.Cache;
 import cache.CacheEntry;
+import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import java.nio.ByteBuffer;
 import javax.annotation.Nonnull;
@@ -13,7 +14,7 @@ public class GetCommand extends Command {
   }
 
   @Override
-  public CommandResult executeInternal() {
+  protected CommandResult executeInternal() {
     final CacheEntry entry = getCache().get(getKey());
 
     if (entry != null) {
@@ -36,12 +37,11 @@ public class GetCommand extends Command {
    * Example: get <key>*\r\n
    */
   @Override
-  public Command decodeInternal(ByteBuf in) {
-    final int length = in.bytesBefore(DELIMITER_END_OF_LINE);
-    final byte[] bytes = new byte[length];
-    in.readBytes(bytes);
+  protected Command decodeInternal(@Nonnull final ByteBuf in) {
+    Preconditions.checkArgument(in != null, "Input ByteBuf can not be null");
 
-    setKey(new String(bytes));
+    final int length = in.bytesBefore(DELIMITER_END_OF_LINE);
+    setKey(readBytesHelper(in, length));
 
     in.skipBytes(2); // \r\n
 
