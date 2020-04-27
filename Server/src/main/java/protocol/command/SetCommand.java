@@ -32,28 +32,28 @@ public class SetCommand extends Command {
   public Command decodeInternal(ByteBuf in) {
     // Key
     int length = in.bytesBefore(DELIMITER_SPACE);
-    setKey(read(in, length));
+    setKey(readBytesHelper(in, length));
 
     // Skipping 'space'
     in.skipBytes(1);
 
     // Flags
     length = in.bytesBefore(DELIMITER_SPACE);
-    setFlags(Integer.parseInt(read(in, length)));
+    setFlags(Integer.parseInt(readBytesHelper(in, length)));
 
     // Skipping 'space'
     in.skipBytes(1);
 
     // expTime
     length = in.bytesBefore(DELIMITER_SPACE);
-    setExpTime(Integer.parseInt(read(in, length)));
+    setExpTime(Integer.parseInt(readBytesHelper(in, length)));
 
     // Skipping 'space'
     in.skipBytes(1);
 
     // data size
     length = in.bytesBefore(DELIMITER_END_OF_LINE);
-    int dataSize = Integer.parseInt(read(in, length));
+    int dataSize = Integer.parseInt(readBytesHelper(in, length));
 
     setDataSize(dataSize);
 
@@ -113,13 +113,6 @@ public class SetCommand extends Command {
 
   private void setDataSize(int dataSize) {
     this.dataSize = dataSize;
-  }
-
-  private String read(final ByteBuf in, final int length) {
-    final byte[] bytes = new byte[length];
-    in.readBytes(bytes);
-
-    return new String(bytes).trim();
   }
 
   private void setData(final byte[] data) {

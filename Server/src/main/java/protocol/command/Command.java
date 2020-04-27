@@ -1,6 +1,7 @@
 package protocol.command;
 
 import cache.Cache;
+import com.google.common.base.Preconditions;
 import io.netty.buffer.ByteBuf;
 import javax.annotation.Nonnull;
 import protocol.exception.CommandDecodingException;
@@ -22,6 +23,8 @@ public abstract class Command {
   private String key;
 
   public Command(@Nonnull final Cache cache) {
+    Preconditions.checkArgument(cache != null, "Input Cache can not be null");
+
     this.cache = cache;
   }
 
@@ -59,6 +62,13 @@ public abstract class Command {
     return cache;
   }
 
+  protected String readBytesHelper(final ByteBuf in, final int length) {
+    final byte[] bytes = new byte[length];
+    in.readBytes(bytes);
+
+    return new String(bytes).trim();
+  }
+
   @Override
   public String toString() {
     return "Command {" +
@@ -67,7 +77,21 @@ public abstract class Command {
         '}';
   }
 
+  /**
+   * Simple Factory to create a command
+   */
   public static class CommandFactory {
+    /**
+     * Create a command based on the input String command.
+     * Input string has to match on eof enum {@link CommandType#getStrName()} values,
+     * otherwise {@link CommandFactory#createCommand(String, Cache)} will fail with
+     * {@link UnsupportedCommandException}
+     *
+     * @param command in string format. It has to match one of {@link CommandType#getStrName()}
+     * @param cache the cache that this command will be executed on
+     * @return {@link Command} object
+     * @throws UnsupportedCommandException if command doesn't exists
+     */
     public static Command createCommand(@Nonnull final String command, @Nonnull final Cache cache) throws UnsupportedCommandException {
 
       if (CommandType.GET.getStrName().equals(command)) {
@@ -84,6 +108,10 @@ public abstract class Command {
     }
   }
 
+  /**
+   * Enum represents the command types supported
+   * by the server
+   */
   public enum CommandType {
     GET("get"),
     SET("set"),
@@ -101,6 +129,9 @@ public abstract class Command {
     }
   }
 
+  /**
+   * Encapsulate the result of executing a command
+   */
   public static class CommandResult {
     private final CommandType type;
     private final byte[] resultValue;
